@@ -8,6 +8,8 @@ const searchForm = document.querySelector("[data-searchForm]");
 const loadingScreen = document.querySelector(".loading-container");
 const userInfoContainer = document.querySelector(".user-info-container");
 const grantAccessButton = document.querySelector("[data-grantAccess]");
+const wrapper = document.querySelector(".wrapper"); // Ensure this exists
+
 
 // to know exactly where to switch if you're on yser then current will be user and switch to search and vice versa
 
@@ -15,6 +17,7 @@ const grantAccessButton = document.querySelector("[data-grantAccess]");
 let currentTab = userTab;
 
 const API_KEY = "d1845658f92b31c64bd94f06f7188c9c";
+const UNSPLASH_ACCESS_KEY = "3vD_Bc-KNxU6Rb-9puDEEJP9Nc90IfcUwTr4VzNkGXA";
 
 // current tab means the tab which is currently selected
 //clicked tab means now this tab will bw current tab and previous tab will not be current
@@ -108,6 +111,7 @@ async function fetchUserWeatherInfo(coordinates) {
     // data is passed as a parameter
 
     renderWeatherInfo(data);
+    fetchCityImage(data.name); // Added function call to fetch background image based on city name
   } catch (err) {
     //hw
     loadingScreen.classList.remove("active");
@@ -165,6 +169,24 @@ function renderWeatherInfo(weatherInfo) {
   cloudiness.innerText = `${weatherInfo?.clouds?.all}%`;
 }
 
+
+
+async function fetchCityImage(city) {
+  try {
+      const response = await fetch(
+          `https://api.unsplash.com/photos/random?query=${city} monument&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
+      );
+      const data = await response.json();
+      const imageUrl = data?.urls?.regular;
+
+      if (imageUrl) {
+          wrapper.style.backgroundImage = `url(${imageUrl})`;
+      }
+  } catch (error) {
+      console.error("Error fetching city image:", error);
+  }
+}
+
 function getLocation() {
   // checking if browser support geolocation or not
   // if yes then find the location
@@ -220,6 +242,7 @@ async function fetchSearchWeatherInfo(city) {
     loadingScreen.classList.remove("active");
     userInfoContainer.classList.add("active");
     renderWeatherInfo(data);
+    fetchCityImage(data.name); // Added function call to fetch background image based on city name
   } catch (err) {
     //hW
   }
